@@ -22,7 +22,6 @@ function PublicWallet(props) {
 
   function getWalletDetails() {
     var newWallet = walletInitial()
-
     fetch('/api/get-public-wallet?address=' + walletAddressParam).then((response) => response.json()).then((data) => {
       if(!data.address) {
         navigate("/")
@@ -40,45 +39,37 @@ function PublicWallet(props) {
             Public Wallet: <span className="orange">{ wallet.address }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
             Balance: <span className="orange">{ wallet.balance }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
             Unconfirmed Balance: <span className="orange">{ wallet.unconfirmed_balance }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
             Total Received: <span className="orange">{ wallet.total_received }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
             Total Sent: <span className="orange">{ wallet.total_sent }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
             Last Updated: <span className="orange">{ wallet.last_updated }</span>
           </Typography>
         </Grid>
-
         <Grid item xs={12} align="center">
           <img alt="QR Code" src={ 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + wallet.address }/>
         </Grid>
-
         <Grid item xs={12} align="center">
          <a href="/">Back</a>
         </Grid>
-
       </Grid>
     </div>
   );

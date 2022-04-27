@@ -32,7 +32,6 @@ function walletInitial() {
     total_received: '-',
     total_sent: '-',
   }
-
   return wallet
 }
 
@@ -62,9 +61,7 @@ function SenderWallet(props) {
   }
 
   function refreshActiveWallet() {
-
     var newActiveWallet = walletInitial()
-
     const getRequestOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
@@ -75,7 +72,6 @@ function SenderWallet(props) {
     ).then((data) => {
         if(data[0]){
           newActiveWallet = data[0]
-
           const requestOptions_2 = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -100,13 +96,11 @@ function SenderWallet(props) {
     var newWallet = {
       name: e.target.value,
     }
-
     updateWallet(prevWallet => newWallet)
   }
 
   function setWallet() {
     var newActiveWallet = walletInitial()
-
     if(wallet.name == 'n/a'){
       alert("Invalid Wallet Name")
     } else {
@@ -138,43 +132,34 @@ function SenderWallet(props) {
               Sending Wallet
             </Typography>
           </Grid>
-
           <Grid item xs={12} align="center">
             <FormControl style={{ minWidth: '100%' }}>
               <TextField onChange={ handleNameFieldChange } fullWidth required={true} type="text" placeholder="Name, e.g. Bob" />
             </FormControl>
           </Grid>
-
           <Grid item xs={12} align="center">
               <Button onClick={ setWallet } color="orange" variant="contained" style={{ minWidth: '100%'}}>
                 <span className="buttonText">Set Sending Wallet</span>
               </Button>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="name"><span>Wallet Name</span>{ activeWallet.name }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="address"><span>Public Address</span>{ activeWallet.address }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="balance"><span>Balance</span>{ activeWallet.balance }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="balance"><span>Unconfirmed Balance</span>{ activeWallet.unconfirmed_balance }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="balance"><span>Total Received</span>{ activeWallet.total_received }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <div className="balance"><span>Total Sent</span>{ activeWallet.total_sent }</div>
           </Grid>
-
           <Grid item xs={12} align="center">
             <Button onClick={ refreshActiveWallet } color="orange" variant="contained" style={{ minWidth: '100%'}}>
               <span className="buttonText">Refresh Sending Wallet</span>

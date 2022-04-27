@@ -17,7 +17,6 @@ function AllPublicWallets(props) {
 
   function loadWallets() {
     var newRecentWallets = walletsInitial()
-
     const getRequestOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
@@ -30,7 +29,6 @@ function AllPublicWallets(props) {
         updateRecentWallets(prevRecentWallets => newRecentWallets)
       });
   }
-
 
   function renderWalletList() {
     if (recentWallets.length > 0) {
@@ -56,11 +54,9 @@ function AllPublicWallets(props) {
           </Typography>
           { renderWalletList() }
         </Grid>
-
         <Grid item xs={12} align="center">
          <a href="/">Back</a>
         </Grid>
-
       </Grid>
     </div>
   );

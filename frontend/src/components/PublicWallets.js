@@ -37,7 +37,6 @@ function walletsInitial() {
     return wallets
 }
 
-
 function PublicWallets(props) {
   const [wallet, updateWallet] = useState(() => walletInitial())
   const [recentWallets, updateRecentWallets] = useState(() => walletsInitial())
@@ -47,7 +46,6 @@ function PublicWallets(props) {
 
   function loadWallets() {
     var newRecentWallets = walletsInitial()
-
     const getRequestOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
@@ -67,7 +65,6 @@ function PublicWallets(props) {
       address: e.target.value,
       amount: wallet.amount,
     }
-
     updateWallet(prevWallet => newWallet)
   }
 
@@ -76,13 +73,11 @@ function PublicWallets(props) {
       address: wallet.address,
       amount: e.target.value,
     }
-
     updateWallet(prevWallet => newWallet)
   }
 
   function searchAndSend() {
     var newRecentWallets = walletsInitial()
-
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -114,7 +109,6 @@ function PublicWallets(props) {
 
   function searchWallet() {
     var newRecentWallets = walletsInitial()
-
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -166,13 +160,11 @@ function PublicWallets(props) {
               Receiving Wallet
             </Typography>
           </Grid>
-
           <Grid item xs={6} align="center">
             <FormControl style={{ minWidth: '100%' }}>
               <TextField onChange={ handleAddressFieldChange } fullWidth required={true} type="text" placeholder="Receiving Address, e.g. 2MsYQSzRirq6N6jjKkZQ9F5gpjdnlEvGnAh" />
             </FormControl>
           </Grid>
-
           <Grid item xs={6} align="center">
             <FormControl style={{ minWidth: '100%' }}>
               <TextField
@@ -187,26 +179,22 @@ function PublicWallets(props) {
               />
             </FormControl>
           </Grid>
-
           <Grid item xs={6} align="center">
             <Button onClick={ searchWallet } color="orange" variant="contained" style={{ minWidth: '100%'}}>
               <span className="buttonText">Search</span>
             </Button>
           </Grid>
-
           <Grid item xs={6} align="center">
             <Button onClick={ searchAndSend } color="orange" variant="contained" style={{ minWidth: '100%'}}>
               <span className="buttonText">Send</span>
             </Button>
           </Grid>
-
           <Grid item xs={12} align="center">
             <Typography component="h3" variant="h4" style={{ marginTop: '2em'}}>
               Recent Wallets
             </Typography>
             { renderWalletList() }
           </Grid>
-
           <Grid item xs={12} align="center">
            <a href="/public-wallets">View All Wallets</a>
           </Grid>

@@ -15,8 +15,9 @@ from blockcypher import make_tx_signatures
 from blockcypher import broadcast_signed_transaction
 import requests
 import json
-import binascii
 
+## Creates and Updates Sender Wallets
+## Generates New Address Endpoints for new Wallets
 class CreateSenderWalletView(APIView):
     serializer_class = CreateSenderWalletSerializer
 
@@ -24,7 +25,6 @@ class CreateSenderWalletView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
-
             queryset = SenderWallet.objects.filter(name=name)
             if queryset.exists():
                 senderWallet = queryset[0]
@@ -93,6 +93,8 @@ class CreateSenderWalletView(APIView):
 
         return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+## Creates Public Wallets
+## Updates Stored Wallets Older than 30 Minues
 class CreatePublicWalletSearchView(APIView):
     serializer_class = CreatePublicWalletSerializer
 
@@ -111,7 +113,9 @@ class CreatePublicWalletSearchView(APIView):
             queryset = PublicWallet.objects.filter(address=address)
             if queryset.exists():
                 publicWallet = queryset[0]
-                time_threshold = timezone.now() - timezone.timedelta(seconds=5) ###### Chnage before demo!!!!!!!
+
+                ## time_threshold indicates if address needs to be updated (Default: minutes=30)
+                time_threshold = timezone.now() - timezone.timedelta(seconds=5)
                 queryset = queryset.filter(last_updated__gt=time_threshold)
 
                 if not queryset.exists() :
@@ -135,6 +139,9 @@ class CreatePublicWalletSearchView(APIView):
 
         return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+## Creates Public Wallets
+## Updates Stored Wallets Older than 30 Minues
+## Sends a Transation to the Wallet
 class CreatePublicWalletSendView(APIView):
     serializer_class = CreatePublicWalletSerializer
 
@@ -158,7 +165,7 @@ class CreatePublicWalletSendView(APIView):
             if activeQueryset.exists():
                 activeSenderWallet = activeQueryset[0]
 
-                ### Create Unsigned Transaction ###
+                ## Create Unsigned Transaction
                 inputs = [{'address': activeSenderWallet.address}, ]
                 outputs = [{'address': address, 'value': int(amount)}]
                 try:
@@ -169,11 +176,11 @@ class CreatePublicWalletSendView(APIView):
                     print("\n" + unsigned_tx + "\n")
                     return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
 
-                ### Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] ) ###
+                ## Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] )
                 privkey_list = [activeSenderWallet.private,]
                 pubkey_list = [activeSenderWallet.public,]
 
-                ### Create Transaction Signatures ###
+                ## Create Transaction Signatures
                 try:
                     tx_signatures = make_tx_signatures(txs_to_sign=unsigned_tx['tosign'], privkey_list=privkey_list, pubkey_list=pubkey_list)
                 except:
@@ -182,7 +189,7 @@ class CreatePublicWalletSendView(APIView):
                     print("\n" + unsigned_tx + "\n")
                     return Response({'error': 'Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
 
-                ### Send Transaction ###
+                ## Send Transaction
                 try:
                     sent_tx = broadcast_signed_transaction(api_key=API_KEY, coin_symbol='btc-testnet', unsigned_tx=unsigned_tx, signatures=tx_signatures, pubkeys=pubkey_list)
                 except:
@@ -201,7 +208,9 @@ class CreatePublicWalletSendView(APIView):
             queryset = PublicWallet.objects.filter(address=address)
             if queryset.exists():
                 publicWallet = queryset[0]
-                time_threshold = timezone.now() - timezone.timedelta(seconds=5) ###### Chnage before demo!!!!!!!
+
+                ## time_threshold indicates if address needs to be updated (Default: minutes=30)
+                time_threshold = timezone.now() - timezone.timedelta(seconds=5)
                 queryset = queryset.filter(last_updated__gt=time_threshold)
 
                 if not queryset.exists() :
@@ -225,23 +234,29 @@ class CreatePublicWalletSendView(APIView):
 
         return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+## Retutns All Sender Wallets
 class SenderWalletView(generics.ListAPIView):
     queryset = SenderWallet.objects.all()
     serializer_class = SenderWalletSerializer
 
+## Retutns the Active Sender Wallets
 class ActiveSenderWalletView(generics.ListAPIView):
     queryset = ActiveSenderWallet.objects.all()
     serializer_class = SenderWalletSerializer
 
+## Retutns All Public Wallets
 class PublicWalletView(generics.ListAPIView):
     queryset = PublicWallet.objects.all()
     serializer_class = PublicWalletSerializer
 
+## Retutns All Recent Wallets
 class RecentPublicWalletView(generics.ListAPIView):
+    ## time_threshold indicates if address is to be returned (Default: minutes=30)
     time_threshold = timezone.now() - timezone.timedelta(minutes=30)
     queryset = PublicWallet.objects.filter(last_updated__gt=time_threshold)
     serializer_class = PublicWalletSerializer
 
+## Retruns a Public Wallet with the Given Address
 class GetPublicWallet(APIView):
     serializer_class = PublicWalletSerializer
     lookup_url_kwarg = 'address'

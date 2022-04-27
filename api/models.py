@@ -1,8 +1,5 @@
 from django.db import models
 
-#'id', 'address', 'balance', 'unconfirmed_balance', 'total_received',' total_sent', 'last_updated',
-
-# Create your models here.
 class SenderWallet(models.Model):
     name = models.CharField(max_length=50, default="")
     public = models.CharField(max_length=150, default="")
