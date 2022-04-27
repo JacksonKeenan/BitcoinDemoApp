@@ -1,0 +1,57 @@
+html {
+  background: #356554;
+}
+.App {
+  text-align: center;
+}
+
+h1, h2, h3, h4, h5 {
+  font-weight: bold;
+}
+
+h1 {
+  color: #d6d2c4;
+  font-size: 3em;
+}
+
+.SenderWallet, .PublicWallets {
+  background: #d6d2c4;
+  max-width: 1050px;
+  margin: 2.25em auto;
+  padding: 1em 2em;
+  border: 5px solid #fa4616;
+  text-align: right;
+  color: #356554;
+}
+
+.SenderWallet span {
+  display: block;
+  font-weight: bold;
+}
+
+.buttonText {
+  font-size: 1.45em;
+  font-weight: bold;
+}
+
+.RecentWallet {
+  color: #356554;
+  display: block;
+  text-align: left;
+  padding: 0 1em;
+  border: 2px solid #fa4616;
+  margin: 1em auto;
+  text-decoration: none;
+}
+
+.RecentWallet span {
+  font-weight: bold;
+}
+
+img {
+  margin: 1em 0;
+}
+
+a {
+  color: #356554;
+}
