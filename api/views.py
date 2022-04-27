@@ -162,7 +162,7 @@ class CreatePublicWalletSendView(APIView):
                 inputs = [{'address': activeSenderWallet.address}, ]
                 outputs = [{'address': address, 'value': int(amount)}]
                 try:
-                    unsigned_tx = create_unsigned_tx(api_key='206d85f8a5bd427a823bd2bdabbd9675', inputs=inputs, outputs=outputs, coin_symbol='btc-testnet', preference='zero')
+                    unsigned_tx = create_unsigned_tx(api_key=API_KEY, inputs=inputs, outputs=outputs, coin_symbol='btc-testnet', preference='zero')
                 except:
                     return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
                 if("error" in blockcypherResponse):
@@ -184,7 +184,7 @@ class CreatePublicWalletSendView(APIView):
 
                 ### Send Transaction ###
                 try:
-                    sent_tx = broadcast_signed_transaction(api_key='206d85f8a5bd427a823bd2bdabbd9675', coin_symbol='btc-testnet', unsigned_tx=unsigned_tx, signatures=tx_signatures, pubkeys=pubkey_list)
+                    sent_tx = broadcast_signed_transaction(api_key=API_KEY, coin_symbol='btc-testnet', unsigned_tx=unsigned_tx, signatures=tx_signatures, pubkeys=pubkey_list)
                 except:
                     return Response({'error': 'Bad Transaction (Signed)'}, status=status.HTTP_400_BAD_REQUEST)
                 if("error" in blockcypherResponse):
