@@ -59,7 +59,6 @@ function PublicWallets(props) {
       });
   }
 
-
   function handleAddressFieldChange(e) {
     const newWallet = {
       address: e.target.value,

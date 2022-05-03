@@ -15,6 +15,9 @@ from blockcypher import make_tx_signatures
 from blockcypher import broadcast_signed_transaction
 import requests
 import json
+import os
+
+API_KEY = os.environ.get('BC_API')
 
 ## Creates and Updates Sender Wallets
 ## Generates New Address Endpoints for new Wallets
@@ -146,13 +149,10 @@ class CreatePublicWalletSendView(APIView):
     serializer_class = CreatePublicWalletSerializer
 
     def post(self, request, format=None):
-
-
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             address = serializer.data.get('address')
             amount = request.data['amount']
-            print(amount)
 
             try:
                 blockcypherResponse = get_address_overview(address, 'btc-testnet');
@@ -173,7 +173,6 @@ class CreatePublicWalletSendView(APIView):
                 except:
                     return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
                 if("error" in blockcypherResponse):
-                    print("\n" + unsigned_tx + "\n")
                     return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] )
@@ -186,7 +185,6 @@ class CreatePublicWalletSendView(APIView):
                 except:
                     return Response({'error': 'Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
                 if("error" in blockcypherResponse):
-                    print("\n" + unsigned_tx + "\n")
                     return Response({'error': 'Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Send Transaction
@@ -195,7 +193,6 @@ class CreatePublicWalletSendView(APIView):
                 except:
                     return Response({'error': 'Bad Transaction (Signed)'}, status=status.HTTP_400_BAD_REQUEST)
                 if("error" in blockcypherResponse):
-                    print("\n" + unsigned_tx + "\n")
                     return Response({'error': 'Bad Transaction (Signed)'}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
