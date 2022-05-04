@@ -15,6 +15,7 @@ import sys
 ## Blockcypher API Token
 API_KEY = os.environ.get('BC_API')
 
+## Verifies and Searches for a given address. If valid stores the information for the address
 def SearchAddress(address):
     try:
         blockcypherResponse = get_address_overview(address, 'btc-testnet');
@@ -22,6 +23,9 @@ def SearchAddress(address):
         return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
 
     queryset = PublicWallet.objects.filter(address=address)
+
+    ## Checks if a Wallet with the given address already exists
+    ## If Yes: Updates that Wallet's information if the data is older than the set threshold
     if queryset.exists():
         publicWallet = queryset[0]
 
@@ -38,6 +42,8 @@ def SearchAddress(address):
             publicWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'last_updated'])
 
         return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_200_OK)
+
+    ## If No: Adds Wallet's information to the database
     else:
         publicWallet = PublicWallet(address=address)
         publicWallet.balance = blockcypherResponse['balance']
@@ -58,6 +64,9 @@ class CreateSenderWalletView(APIView):
         if serializer.is_valid():
             name = serializer.data.get('name')
             queryset = SenderWallet.objects.filter(name=name)
+
+            ## Checks if a Wallet with the given name already exists
+            ## If Yes: Sets that Wallet as the Active Wallet
             if queryset.exists():
                 senderWallet = queryset[0]
 
@@ -80,6 +89,8 @@ class CreateSenderWalletView(APIView):
                 senderWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'is_active',])
 
                 return Response(SenderWalletSerializer(senderWallet).data, status=status.HTTP_200_OK)
+
+            ## If No: Creates a new endpoint and stores the information as a new Wallet, then sets new Wallet as the Active Wallet
             else:
                 newWallet = requests.post('https://api.blockcypher.com/v1/btc/test3/addrs')
                 newWallet = newWallet.text
@@ -104,7 +115,7 @@ class CreateSenderWalletView(APIView):
         return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 ## Creates Public Wallets
-## Updates Stored Wallets Older than 30 Minutes
+## Updates Stored Wallets Older than the given threshold
 class CreatePublicWalletSearchView(APIView):
     serializer_class = CreatePublicWalletSerializer
 
@@ -118,7 +129,7 @@ class CreatePublicWalletSearchView(APIView):
         return Response({'Error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 ## Creates Public Wallets
-## Updates Stored Wallets Older than 30 Minutes
+## Updates Stored Wallets Older than the given threshold
 ## Sends a Transation to the Wallet
 class CreatePublicWalletSendView(APIView):
     serializer_class = CreatePublicWalletSerializer

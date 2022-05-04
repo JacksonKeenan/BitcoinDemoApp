@@ -8,9 +8,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
-//Constant for 'Recent Wallets' timethreshold
+// Constant for 'Recent Wallets' timethreshold
 const delta=30
 
+// Material UI Styling
 const theme = createTheme({
   palette: {
     orange: {
@@ -27,11 +28,13 @@ const theme = createTheme({
   }
 });
 
+// Initializing Wallet address for searching, and amount field for sending
 function walletInitial() {
   const wallet = { address: "n/a", amount: "1000", }
   return wallet
 }
 
+// Initializing Recent Wallets
 function walletsInitial() {
   var wallets = {}
   return wallets
@@ -74,7 +77,7 @@ function PublicWallets(props) {
       alert('Error: Invalid Address')
       return
     }
-    
+
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},

@@ -26,7 +26,9 @@ Once you have built the front-end navigate to the root directory and start the D
     - Updated views.py and serializers.py to reflect model changes.
 - **May 4, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/8cf48053549928485279be35c15a07e6e9c1d14f)
   - Significantly improved error trapping for Blockcypher API calls
-- **May 4, 2022:**
+- **May 4, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/fab31d8c473b57e1718c38f82a04f9a51a8182e3)
   - Reduced code re-use by refactoring
     - Both 'CreatePublicWalletSearchView' & 'CreatePublicWalletSendView' now call 'SearchAddress' instead of searching and storing a public address internally.
     - Removed  'RecentPublicWalletView' and added the ability to filter by a time delta to 'PublicWalletView'
+- **May 4, 2022:**
+    - Updated Commenting & Documentation

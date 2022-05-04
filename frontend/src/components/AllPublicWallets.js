@@ -4,9 +4,10 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
+// Initializing Wallets
 function walletsInitial() {
   var wallets = {}
-    return wallets
+  return wallets
 }
 
 function AllPublicWallets(props) {

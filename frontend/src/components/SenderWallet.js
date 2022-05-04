@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
+// Material UI Styling
 const theme = createTheme({
   palette: {
     orange: {
@@ -23,6 +24,7 @@ const theme = createTheme({
   }
 });
 
+// Initializing Wallet for html fields
 function walletInitial() {
   var wallet = { name: 'n/a', address: 'n/a', balance: '-', unconfirmed_balance: '-', total_received: '-', total_sent: '-', }
   return wallet
