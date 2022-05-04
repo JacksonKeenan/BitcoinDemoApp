@@ -44,7 +44,6 @@ function SenderWallet(props) {
 
   function loadActiveWallet() {
     var newActiveWallet = walletInitial()
-
     const getRequestOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json'},
@@ -101,7 +100,7 @@ function SenderWallet(props) {
 
   function setWallet() {
     var newActiveWallet = walletInitial()
-    if(wallet.name == 'n/a'){
+    if(wallet.name == 'n/a' || !wallet.name){
       alert("Invalid Wallet Name")
     } else {
       const requestOptions = {
@@ -113,8 +112,8 @@ function SenderWallet(props) {
       fetch('/api/create-sender-wallet', requestOptions).then((response) =>
         response.json()
       ).then((data) => {
-        if(!data.address) {
-          alert("Invalid Wallet Name")
+        if(data.Error) {
+          alert(data.Error)
         } else {
           newActiveWallet = data
           updateActiveWallet(prevActiveWallet => newActiveWallet)

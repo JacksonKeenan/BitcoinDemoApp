@@ -77,6 +77,10 @@ function PublicWallets(props) {
 
   function searchAndSend() {
     var newRecentWallets = walletsInitial()
+    if(!wallet.address) {
+      alert('Error: Invalid Address')
+      return
+    }
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -86,8 +90,8 @@ function PublicWallets(props) {
     fetch('/api/create-public-wallet-send', requestOptions).then((response) =>
       response.json()
     ).then((data) => {
-        if(!data.address) {
-          alert("Invalid Address / Transaction")
+        if(data.Error) {
+          alert(data.Error)
         } else {
           alert("Transaction Successfully Sent")
         }
@@ -118,7 +122,7 @@ function PublicWallets(props) {
       response.json()
     ).then((data) => {
         if(!data.address) {
-          alert("Invalid Address")
+          alert("Error: Invalid Address")
         }
 
         const getRequestOptions = {

@@ -10,9 +10,11 @@ from blockcypher import get_address_overview, create_unsigned_tx, make_tx_signat
 import requests
 import json
 import os
+import sys
 
 ## Blockcypher API Token
 API_KEY = os.environ.get('BC_API')
+
 
 ## Creates and Updates Sender Wallets
 ## Generates New Address Endpoints for new Wallets
@@ -30,9 +32,7 @@ class CreateSenderWalletView(APIView):
                 try:
                     blockcypherResponse = get_address_overview(senderWallet.address, 'btc-testnet');
                 except:
-                    return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
-                if("error" in blockcypherResponse):
-                    return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'Error': 'Assertion Error: Invalid Address format for coin symbol'}, status=status.HTTP_400_BAD_REQUEST)
 
                 activeQueryset = SenderWallet.objects.filter(is_active=True)
                 if activeQueryset.exists():
@@ -56,9 +56,7 @@ class CreateSenderWalletView(APIView):
                 try:
                     blockcypherResponse = get_address_overview(newWallet['address'], 'btc-testnet');
                 except:
-                    return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
-                if("error" in blockcypherResponse):
-                    return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
 
                 activeQueryset = SenderWallet.objects.filter(is_active=True)
                 if activeQueryset.exists():
@@ -86,9 +84,7 @@ class CreatePublicWalletSearchView(APIView):
             try:
                 blockcypherResponse = get_address_overview(address, 'btc-testnet');
             except:
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
-            if("error" in blockcypherResponse):
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
 
             queryset = PublicWallet.objects.filter(address=address)
             if queryset.exists():
@@ -134,9 +130,7 @@ class CreatePublicWalletSendView(APIView):
             try:
                 blockcypherResponse = get_address_overview(address, 'btc-testnet');
             except:
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
-            if("error" in blockcypherResponse):
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
 
             activeQueryset = SenderWallet.objects.filter(is_active=True)
             if activeQueryset.exists():
@@ -148,36 +142,42 @@ class CreatePublicWalletSendView(APIView):
                 try:
                     unsigned_tx = create_unsigned_tx(api_key=API_KEY, inputs=inputs, outputs=outputs, coin_symbol='btc-testnet', preference='zero')
                 except:
-                    return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
-                if("error" in blockcypherResponse):
-                    return Response({'error': 'Bad Transaction (Unsigned)'}, status=status.HTTP_400_BAD_REQUEST)
+                    print('\nError Creating Unsigned Transation: ' + str(sys.exc_info()[0]) + '\n')
+                    return Response({'Error': 'Error Creating Unsigned Transation: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] )
-                privkey_list = [activeSenderWallet.private,]
-                pubkey_list = [activeSenderWallet.public,]
+                privkey_list = []
+                pubkey_list = []
+
+                for x in unsigned_tx['tosign']:
+                    privkey_list.append(activeSenderWallet.private)
+                    pubkey_list.append(activeSenderWallet.public)
 
                 ## Create Transaction Signatures
                 try:
                     tx_signatures = make_tx_signatures(txs_to_sign=unsigned_tx['tosign'], privkey_list=privkey_list, pubkey_list=pubkey_list)
+                except AssertionError as e:
+                    print('\nError Signing Transaction: \n' + str(e) + '\n')
+                    return Response({'Error': 'Error: Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
-                    return Response({'error': 'Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
-                if("error" in blockcypherResponse):
-                    return Response({'error': 'Bad Transaction Signatures'}, status=status.HTTP_400_BAD_REQUEST)
+                    print('\nError Signing Transaction: ' + str(sys.exc_info()[0]) + '\n')
+                    return Response({'Error': 'Error Bad Transaction Signatures See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Send Transaction
                 try:
                     sent_tx = broadcast_signed_transaction(api_key=API_KEY, coin_symbol='btc-testnet', unsigned_tx=unsigned_tx, signatures=tx_signatures, pubkeys=pubkey_list)
+                except AssertionError as e:
+                    print('\nError Sending Transaction: \n' + str(e) + '\n')
+                    return Response({'Error': 'Error Sending Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
-                    return Response({'error': 'Bad Transaction (Signed)'}, status=status.HTTP_400_BAD_REQUEST)
-                if("error" in blockcypherResponse):
-                    return Response({'error': 'Bad Transaction (Signed)'}, status=status.HTTP_400_BAD_REQUEST)
+                    print('\nError Sending Transaction: ' + str(sys.exc_info()[0]) + '\n')
+                    return Response({'Error': 'Error Sending Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
+
 
             try:
                 blockcypherResponse = get_address_overview(address, 'btc-testnet');
             except:
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
-            if("error" in blockcypherResponse):
-                return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
 
             queryset = PublicWallet.objects.filter(address=address)
             if queryset.exists():
@@ -206,7 +206,7 @@ class CreatePublicWalletSendView(APIView):
                 publicWallet.save()
                 return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_201_CREATED)
 
-        return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 ## Retutns All Sender Wallets
 class SenderWalletView(generics.ListAPIView):
