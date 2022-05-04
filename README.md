@@ -19,7 +19,8 @@ Once you have built the front-end navigate to the root directory and start the D
 - **May 3, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/1e826233aa932123fc81fc1a7c1be232ad9ce5af)
   - Added environment variable support
   - Added README.md with setup instructions and changelog
-- **May 3, 2022:**
+- **May 3, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/12e4dcc59e703663494927acce4135ba9c8ae634)
   - Updated Database Models
-    - Removed ActiveSenderWallet table, replaced with 'is_active' flag in the SenderWallet table to indicate current active sending wallet.
+    - Both 'SenderWallets' & 'PublicWallets' models now inherit from abstract 'Wallet'
+    - Removed 'ActiveSenderWallet' model, replaced with 'is_active' flag in the 'SenderWallet' model to indicate current active sending wallet.
     - Updated views.py and serializers.py to reflect model changes.
