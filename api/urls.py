@@ -1,12 +1,14 @@
 from django.urls import path
-from.views import SenderWalletView
-from.views import PublicWalletView
-from.views import CreateSenderWalletView
-from.views import CreatePublicWalletSendView
-from.views import CreatePublicWalletSearchView
-from.views import RecentPublicWalletView
-from.views import GetPublicWallet
-from.views import ActiveSenderWalletView
+from.views import (
+    SenderWalletView,
+    PublicWalletView,
+    CreateSenderWalletView,
+    CreatePublicWalletSendView,
+    CreatePublicWalletSearchView,
+    RecentPublicWalletView,
+    GetPublicWallet,
+    ActiveSenderWalletView
+)
 
 urlpatterns = [
     path('create-sender-wallet', CreateSenderWalletView.as_view()),

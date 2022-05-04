@@ -5,7 +5,7 @@ from .models import PublicWallet
 class SenderWalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = SenderWallet
-        fields = ('id', 'name', 'public', 'private', 'address', 'balance', 'unconfirmed_balance', 'total_received','total_sent', 'created',)
+        fields = ('id', 'name', 'public', 'private', 'address', 'balance', 'unconfirmed_balance', 'total_received','total_sent', 'created', 'is_active',)
 
 class CreateSenderWalletSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,6 +16,7 @@ class PublicWalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicWallet
         fields = ('id', 'address', 'balance', 'unconfirmed_balance', 'total_received','total_sent', 'last_updated',)
+
 class CreatePublicWalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicWallet

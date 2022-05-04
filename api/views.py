@@ -2,21 +2,16 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import generics, status
-from .serializers import SenderWalletSerializer, CreateSenderWalletSerializer
-from .serializers import PublicWalletSerializer, CreatePublicWalletSerializer
-from .models import SenderWallet
-from .models import ActiveSenderWallet
-from .models import PublicWallet
+from .serializers import SenderWalletSerializer, CreateSenderWalletSerializer, PublicWalletSerializer, CreatePublicWalletSerializer
+from .models import SenderWallet, PublicWallet
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from blockcypher import get_address_overview
-from blockcypher import create_unsigned_tx
-from blockcypher import make_tx_signatures
-from blockcypher import broadcast_signed_transaction
+from blockcypher import get_address_overview, create_unsigned_tx, make_tx_signatures, broadcast_signed_transaction
 import requests
 import json
 import os
 
+## Blockcypher API Token
 API_KEY = os.environ.get('BC_API')
 
 ## Creates and Updates Sender Wallets
@@ -39,28 +34,18 @@ class CreateSenderWalletView(APIView):
                 if("error" in blockcypherResponse):
                     return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
 
+                activeQueryset = SenderWallet.objects.filter(is_active=True)
+                if activeQueryset.exists():
+                    activeSenderWallet = activeQueryset[0]
+                    activeSenderWallet.is_active = False
+                    activeSenderWallet.save(update_fields=['is_active',])
+
                 senderWallet.balance = blockcypherResponse['balance']
                 senderWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
                 senderWallet.total_received = blockcypherResponse['total_received']
                 senderWallet.total_sent = blockcypherResponse['total_sent']
-                senderWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent',])
-
-                activeQueryset = ActiveSenderWallet.objects.all()
-                if activeQueryset.exists():
-                    activeSenderWallet = activeQueryset[0]
-                    activeSenderWallet.name = name
-                    activeSenderWallet.public = senderWallet.public
-                    activeSenderWallet.private = senderWallet.private
-                    activeSenderWallet.address = senderWallet.address
-                    activeSenderWallet.balance = blockcypherResponse['balance']
-                    activeSenderWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                    activeSenderWallet.total_received = blockcypherResponse['total_received']
-                    activeSenderWallet.total_sent = blockcypherResponse['total_sent']
-                    activeSenderWallet.save(update_fields=['name', 'public', 'private', 'address', 'balance', 'unconfirmed_balance', 'total_received', 'total_sent',])
-                else:
-                    activeSenderWallet = ActiveSenderWallet(name=name, public=senderWallet.public, private=senderWallet.private, address=senderWallet.address, balance=blockcypherResponse['balance'], unconfirmed_balance=blockcypherResponse['unconfirmed_balance'], total_received=blockcypherResponse['total_received'], total_sent=blockcypherResponse['total_sent'])
-                    activeSenderWallet.save()
-
+                senderWallet.is_active = True
+                senderWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'is_active',])
 
                 return Response(SenderWalletSerializer(senderWallet).data, status=status.HTTP_200_OK)
             else:
@@ -75,22 +60,14 @@ class CreateSenderWalletView(APIView):
                 if("error" in blockcypherResponse):
                     return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
 
-                senderWallet = SenderWallet(name=name, public=newWallet['public'], private=newWallet['wif'], address=newWallet['address'], balance=blockcypherResponse['balance'], unconfirmed_balance=blockcypherResponse['unconfirmed_balance'], total_received=blockcypherResponse['total_received'], total_sent=blockcypherResponse['total_sent'])
-                senderWallet.save()
-
-                activeQueryset = ActiveSenderWallet.objects.all()
+                activeQueryset = SenderWallet.objects.filter(is_active=True)
                 if activeQueryset.exists():
                     activeSenderWallet = activeQueryset[0]
-                    activeSenderWallet.name = name
-                    activeSenderWallet.public = newWallet['public']
-                    activeSenderWallet.private = newWallet['private']
-                    activeSenderWallet.address = newWallet['address']
-                    activeSenderWallet.balance = blockcypherResponse['balance']
-                    activeSenderWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                    activeSenderWallet.total_received = blockcypherResponse['total_received']
-                    activeSenderWallet.total_sent = blockcypherResponse['total_sent']
-                    activeSenderWallet.save(update_fields=['name', 'public', 'private', 'address', 'balance', 'unconfirmed_balance', 'total_received', 'total_sent',])
+                    activeSenderWallet.is_active = False
+                    activeSenderWallet.save(update_fields=['is_active',])
 
+                senderWallet = SenderWallet(name=name, public=newWallet['public'], private=newWallet['wif'], address=newWallet['address'], balance=blockcypherResponse['balance'], unconfirmed_balance=blockcypherResponse['unconfirmed_balance'], total_received=blockcypherResponse['total_received'], total_sent=blockcypherResponse['total_sent'], is_active=True)
+                senderWallet.save()
 
                 return Response(SenderWalletSerializer(senderWallet).data, status=status.HTTP_201_CREATED)
 
@@ -161,7 +138,7 @@ class CreatePublicWalletSendView(APIView):
             if("error" in blockcypherResponse):
                 return Response({'Bad Request': 'Bad Address'}, status=status.HTTP_400_BAD_REQUEST)
 
-            activeQueryset = ActiveSenderWallet.objects.all()
+            activeQueryset = SenderWallet.objects.filter(is_active=True)
             if activeQueryset.exists():
                 activeSenderWallet = activeQueryset[0]
 
@@ -238,7 +215,7 @@ class SenderWalletView(generics.ListAPIView):
 
 ## Retutns the Active Sender Wallets
 class ActiveSenderWalletView(generics.ListAPIView):
-    queryset = ActiveSenderWallet.objects.all()
+    queryset = SenderWallet.objects.filter(is_active=True)
     serializer_class = SenderWalletSerializer
 
 ## Retutns All Public Wallets
