@@ -15,6 +15,38 @@ import sys
 ## Blockcypher API Token
 API_KEY = os.environ.get('BC_API')
 
+def SearchAddress(address):
+    try:
+        blockcypherResponse = get_address_overview(address, 'btc-testnet');
+    except:
+        return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
+
+    queryset = PublicWallet.objects.filter(address=address)
+    if queryset.exists():
+        publicWallet = queryset[0]
+
+        ## time_threshold indicates if address needs to be updated (Default: minutes=30)
+        time_threshold = timezone.now() - timezone.timedelta(seconds=5)
+        queryset = queryset.filter(last_updated__gt=time_threshold)
+
+        if not queryset.exists() :
+            publicWallet.balance = blockcypherResponse['balance']
+            publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
+            publicWallet.total_received = blockcypherResponse['total_received']
+            publicWallet.total_sent = blockcypherResponse['total_sent']
+            publicWallet.last_updated = timezone.now()
+            publicWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'last_updated'])
+
+        return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_200_OK)
+    else:
+        publicWallet = PublicWallet(address=address)
+        publicWallet.balance = blockcypherResponse['balance']
+        publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
+        publicWallet.total_received = blockcypherResponse['total_received']
+        publicWallet.total_sent = blockcypherResponse['total_sent']
+        publicWallet.last_updated = timezone.now()
+        publicWallet.save()
+        return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_201_CREATED)
 
 ## Creates and Updates Sender Wallets
 ## Generates New Address Endpoints for new Wallets
@@ -72,7 +104,7 @@ class CreateSenderWalletView(APIView):
         return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 ## Creates Public Wallets
-## Updates Stored Wallets Older than 30 Minues
+## Updates Stored Wallets Older than 30 Minutes
 class CreatePublicWalletSearchView(APIView):
     serializer_class = CreatePublicWalletSerializer
 
@@ -80,43 +112,13 @@ class CreatePublicWalletSearchView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             address = serializer.data.get('address')
+            blockcypherResponse = SearchAddress(address)
+            return blockcypherResponse
 
-            try:
-                blockcypherResponse = get_address_overview(address, 'btc-testnet');
-            except:
-                return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
-
-            queryset = PublicWallet.objects.filter(address=address)
-            if queryset.exists():
-                publicWallet = queryset[0]
-
-                ## time_threshold indicates if address needs to be updated (Default: minutes=30)
-                time_threshold = timezone.now() - timezone.timedelta(seconds=5)
-                queryset = queryset.filter(last_updated__gt=time_threshold)
-
-                if not queryset.exists() :
-                    publicWallet.balance = blockcypherResponse['balance']
-                    publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                    publicWallet.total_received = blockcypherResponse['total_received']
-                    publicWallet.total_sent = blockcypherResponse['total_sent']
-                    publicWallet.last_updated = timezone.now()
-                    publicWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'last_updated'])
-
-                return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_200_OK)
-            else:
-                publicWallet = PublicWallet(address=address)
-                publicWallet.balance = blockcypherResponse['balance']
-                publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                publicWallet.total_received = blockcypherResponse['total_received']
-                publicWallet.total_sent = blockcypherResponse['total_sent']
-                publicWallet.last_updated = timezone.now()
-                publicWallet.save()
-                return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_201_CREATED)
-
-        return Response({'Bad Request': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 ## Creates Public Wallets
-## Updates Stored Wallets Older than 30 Minues
+## Updates Stored Wallets Older than 30 Minutes
 ## Sends a Transation to the Wallet
 class CreatePublicWalletSendView(APIView):
     serializer_class = CreatePublicWalletSerializer
@@ -173,38 +175,9 @@ class CreatePublicWalletSendView(APIView):
                     print('\nError Sending Transaction: ' + str(sys.exc_info()[0]) + '\n')
                     return Response({'Error': 'Error Sending Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-            try:
-                blockcypherResponse = get_address_overview(address, 'btc-testnet');
-            except:
-                return Response({'Error': 'Error: Invalid Address'}, status=status.HTTP_400_BAD_REQUEST)
-
-            queryset = PublicWallet.objects.filter(address=address)
-            if queryset.exists():
-                publicWallet = queryset[0]
-
-                ## time_threshold indicates if address needs to be updated (Default: minutes=30)
-                time_threshold = timezone.now() - timezone.timedelta(seconds=5)
-                queryset = queryset.filter(last_updated__gt=time_threshold)
-
-                if not queryset.exists() :
-                    publicWallet.balance = blockcypherResponse['balance']
-                    publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                    publicWallet.total_received = blockcypherResponse['total_received']
-                    publicWallet.total_sent = blockcypherResponse['total_sent']
-                    publicWallet.last_updated = timezone.now()
-                    publicWallet.save(update_fields=['balance', 'unconfirmed_balance', 'total_received', 'total_sent', 'last_updated'])
-
-                return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_200_OK)
-            else:
-                publicWallet = PublicWallet(address=address)
-                publicWallet.balance = blockcypherResponse['balance']
-                publicWallet.unconfirmed_balance = blockcypherResponse['unconfirmed_balance']
-                publicWallet.total_received = blockcypherResponse['total_received']
-                publicWallet.total_sent = blockcypherResponse['total_sent']
-                publicWallet.last_updated = timezone.now()
-                publicWallet.save()
-                return Response(PublicWalletSerializer(publicWallet).data, status=status.HTTP_201_CREATED)
+            ## Getting Updated Balance for Receiving Wallet
+            blockcypherResponse = SearchAddress(address)
+            return blockcypherResponse
 
         return Response({'Error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -219,16 +192,18 @@ class ActiveSenderWalletView(generics.ListAPIView):
     serializer_class = SenderWalletSerializer
 
 ## Retutns All Public Wallets
+## Optional Paramater 'delta' indicates if address is to be returned (Minutes)
 class PublicWalletView(generics.ListAPIView):
-    queryset = PublicWallet.objects.all()
     serializer_class = PublicWalletSerializer
 
-## Retutns All Recent Wallets
-class RecentPublicWalletView(generics.ListAPIView):
-    ## time_threshold indicates if address is to be returned (Default: minutes=30)
-    time_threshold = timezone.now() - timezone.timedelta(minutes=30)
-    queryset = PublicWallet.objects.filter(last_updated__gt=time_threshold)
-    serializer_class = PublicWalletSerializer
+    def get_queryset(self):
+        delta = self.request.query_params.get('delta')
+        if(delta and delta.isdigit()):
+            time_threshold = timezone.now() - timezone.timedelta(minutes=int(delta))
+            queryset = PublicWallet.objects.filter(last_updated__gt=time_threshold)
+        else:
+            queryset = PublicWallet.objects.all()
+        return queryset
 
 ## Retruns a Public Wallet with the Given Address
 class GetPublicWallet(APIView):

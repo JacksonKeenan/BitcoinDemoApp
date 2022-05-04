@@ -24,23 +24,14 @@ const theme = createTheme({
 });
 
 function walletInitial() {
-  var wallet = {
-    name: 'n/a',
-    address: 'n/a',
-    balance: '-',
-    unconfirmed_balance: '-',
-    total_received: '-',
-    total_sent: '-',
-  }
+  var wallet = { name: 'n/a', address: 'n/a', balance: '-', unconfirmed_balance: '-', total_received: '-', total_sent: '-', }
   return wallet
 }
 
 function SenderWallet(props) {
   const [activeWallet, updateActiveWallet] = useState(() => walletInitial())
   const [wallet, updateWallet] = useState(() => walletInitial())
-  useEffect(() => {
-    loadActiveWallet()
-  }, []);
+  useEffect(() => { loadActiveWallet() }, []);
 
   function loadActiveWallet() {
     var newActiveWallet = walletInitial()
@@ -92,15 +83,13 @@ function SenderWallet(props) {
   }
 
   function handleNameFieldChange(e) {
-    var newWallet = {
-      name: e.target.value,
-    }
+    var newWallet = { name: e.target.value, }
     updateWallet(prevWallet => newWallet)
   }
 
   function setWallet() {
     var newActiveWallet = walletInitial()
-    if(wallet.name == 'n/a' || !wallet.name){
+    if(!wallet.name || wallet.name == 'n/a'){
       alert("Invalid Wallet Name")
     } else {
       const requestOptions = {

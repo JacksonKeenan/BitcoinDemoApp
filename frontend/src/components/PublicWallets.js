@@ -8,6 +8,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
+//Constant for 'Recent Wallets' timethreshold
+const delta=30
+
 const theme = createTheme({
   palette: {
     orange: {
@@ -25,24 +28,19 @@ const theme = createTheme({
 });
 
 function walletInitial() {
-  const wallet = {
-    address: "n/a",
-    amount: "1000",
-  }
+  const wallet = { address: "n/a", amount: "1000", }
   return wallet
 }
 
 function walletsInitial() {
   var wallets = {}
-    return wallets
+  return wallets
 }
 
 function PublicWallets(props) {
   const [wallet, updateWallet] = useState(() => walletInitial())
   const [recentWallets, updateRecentWallets] = useState(() => walletsInitial())
-  useEffect(() => {
-    loadWallets()
-  }, []);
+  useEffect(() => { loadWallets() }, []);
 
   function loadWallets() {
     var newRecentWallets = walletsInitial()
@@ -51,7 +49,7 @@ function PublicWallets(props) {
       headers: {'Content-Type': 'application/json'},
     };
 
-    fetch('/api/list-recent-public-wallets', getRequestOptions).then((response) =>
+    fetch('/api/list-public-wallets?delta='+delta, getRequestOptions).then((response) =>
       response.json()
     ).then((data) => {
         newRecentWallets = data
@@ -60,27 +58,23 @@ function PublicWallets(props) {
   }
 
   function handleAddressFieldChange(e) {
-    const newWallet = {
-      address: e.target.value,
-      amount: wallet.amount,
-    }
+    const newWallet = { address: e.target.value, amount: wallet.amount, }
     updateWallet(prevWallet => newWallet)
   }
 
   function handleAmountFieldChange(e) {
-    const newWallet = {
-      address: wallet.address,
-      amount: e.target.value,
-    }
+    const newWallet = { address: wallet.address, amount: e.target.value, }
     updateWallet(prevWallet => newWallet)
   }
 
   function searchAndSend() {
     var newRecentWallets = walletsInitial()
+
     if(!wallet.address) {
       alert('Error: Invalid Address')
       return
     }
+    
     const requestOptions = {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -101,7 +95,7 @@ function PublicWallets(props) {
           headers: {'Content-Type': 'application/json'},
         };
 
-        fetch('/api/list-recent-public-wallets', getRequestOptions).then((response) =>
+        fetch('/api/list-public-wallets?delta='+delta, getRequestOptions).then((response) =>
           response.json()
         ).then((data) => {
             newRecentWallets = data
@@ -130,7 +124,7 @@ function PublicWallets(props) {
           headers: {'Content-Type': 'application/json'},
         };
 
-        fetch('/api/list-recent-public-wallets', getRequestOptions).then((response) =>
+        fetch('/api/list-public-wallets?delta='+delta, getRequestOptions).then((response) =>
           response.json()
         ).then((data) => {
             newRecentWallets = data

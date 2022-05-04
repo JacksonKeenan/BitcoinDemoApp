@@ -24,5 +24,9 @@ Once you have built the front-end navigate to the root directory and start the D
     - Both 'SenderWallets' & 'PublicWallets' models now inherit from abstract model 'Wallet'
     - Removed 'ActiveSenderWallet' model, replaced with 'is_active' flag in the 'SenderWallet' model to indicate current active sending wallet.
     - Updated views.py and serializers.py to reflect model changes.
-- **May 4, 2022:**
+- **May 4, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/8cf48053549928485279be35c15a07e6e9c1d14f)
   - Significantly improved error trapping for Blockcypher API calls
+- **May 4, 2022:**
+  - Reduced code re-use by refactoring
+    - Both 'CreatePublicWalletSearchView' & 'CreatePublicWalletSendView' now call 'SearchAddress' instead of searching and storing a public address internally.
+    - Removed  'RecentPublicWalletView' and added the ability to filter by a time delta to 'PublicWalletView'

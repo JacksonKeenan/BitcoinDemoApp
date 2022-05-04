@@ -5,7 +5,6 @@ from.views import (
     CreateSenderWalletView,
     CreatePublicWalletSendView,
     CreatePublicWalletSearchView,
-    RecentPublicWalletView,
     GetPublicWallet,
     ActiveSenderWalletView
 )
@@ -17,6 +16,5 @@ urlpatterns = [
     path('list-sender-wallets', SenderWalletView.as_view()),
     path('list-active-sender-wallet', ActiveSenderWalletView.as_view()),
     path('list-public-wallets', PublicWalletView.as_view()),
-    path('list-recent-public-wallets', RecentPublicWalletView.as_view()),
     path('get-public-wallet', GetPublicWallet.as_view()),
 ]

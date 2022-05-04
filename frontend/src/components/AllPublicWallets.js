@@ -11,9 +11,7 @@ function walletsInitial() {
 
 function AllPublicWallets(props) {
   const [recentWallets, updateRecentWallets] = useState(() => walletsInitial())
-  useEffect(() => {
-    loadWallets()
-  }, []);
+  useEffect(() => { loadWallets() }, []);
 
   function loadWallets() {
     var newRecentWallets = walletsInitial()
