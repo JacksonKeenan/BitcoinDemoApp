@@ -6,7 +6,7 @@ from .serializers import SenderWalletSerializer, CreateSenderWalletSerializer, P
 from .models import SenderWallet, PublicWallet
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from blockcypher import get_address_overview, create_unsigned_tx, make_tx_signatures, broadcast_signed_transaction
+from blockcypher import get_address_overview, create_unsigned_tx, make_tx_signatures, broadcast_signed_transaction, get_blockchain_overview
 import requests
 import json
 import os
@@ -150,8 +150,11 @@ class CreatePublicWalletSendView(APIView):
                 activeSenderWallet = activeQueryset[0]
 
                 ## Create Unsigned Transaction
+                ## ! NOTE:  Currently this application is not including fees on transactions
+                ## !!!!!!!  If this were to be modified an additional output would need to
+                ## !!!!!!!  be added to prevent left over satoshis getting consumed by fees
                 inputs = [{'address': activeSenderWallet.address}, ]
-                outputs = [{'address': address, 'value': int(amount)}]
+                outputs = [{'address': address, 'value': int(amount)},]
                 try:
                     unsigned_tx = create_unsigned_tx(api_key=API_KEY, inputs=inputs, outputs=outputs, coin_symbol='btc-testnet', preference='zero')
                 except AssertionError as e:
@@ -159,6 +162,8 @@ class CreatePublicWalletSendView(APIView):
                 except:
                     print('\nError Creating Unsigned Transation: ' + str(sys.exc_info()[0]) + '\n')
                     return Response({'Error': 'Error Creating Unsigned Transation: Invalid API Key\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
+                if 'errors' in unsigned_tx and unsigned_tx['errors'][0] is not None:
+                    return Response({'Error': 'Error Creating Transaction: ' + str(unsigned_tx['errors'][0]['error'])}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] )
                 privkey_list = []
@@ -172,14 +177,14 @@ class CreatePublicWalletSendView(APIView):
                 try:
                     tx_signatures = make_tx_signatures(txs_to_sign=unsigned_tx['tosign'], privkey_list=privkey_list, pubkey_list=pubkey_list)
                 except AssertionError as e:
-                    print('\nError Signing Transaction: \n' + str(e) + '\n')
-                    if unsigned_tx['errors'][0] is None:
+                    print('\nError Signing Transaction: \n' + 'Assertion Error (Run in debug mode for more information)' + '\n')
+                    if 'errors' not in unsigned_tx:
                         return Response({'Error': 'Error Signing Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                     else:
                         return Response({'Error': 'Error Signing Transaction: ' + str(unsigned_tx['errors'][0]['error']) + '\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
                     print('\nError Signing Transaction: ' + str(sys.exc_info()[0]) + '\n')
-                    if unsigned_tx['errors'][0] is None:
+                    if 'errors' not in unsigned_tx:
                         return Response({'Error': 'Error Signing Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                     else:
                         return Response({'Error': 'Error Signing Transaction: ' + str(unsigned_tx['errors'][0]['error']) + '\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
@@ -189,16 +194,19 @@ class CreatePublicWalletSendView(APIView):
                     sent_tx = broadcast_signed_transaction(api_key=API_KEY, coin_symbol='btc-testnet', unsigned_tx=unsigned_tx, signatures=tx_signatures, pubkeys=pubkey_list)
                 except AssertionError as e:
                     print('\nError Sending Transaction: \n' + str(e) + '\n')
-                    if unsigned_tx['errors'][0] is None:
+                    if 'errors' not in unsigned_tx:
                         return Response({'Error': 'Error Sending Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                     else:
                         return Response({'Error': 'Error Sending Transaction: ' + str(unsigned_tx['errors'][0]['error']) + '\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
                     print('\nError Sending Transaction: ' + str(sys.exc_info()[0]) + '\n')
-                    if unsigned_tx['errors'][0] is None:
+                    if 'errors' not in unsigned_tx:
                         return Response({'Error': 'Error Sending Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                     else:
                         return Response({'Error': 'Error Sending Transaction: ' + str(unsigned_tx['errors'][0]['error']) + '\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if 'errors' in sent_tx:
+                return Response({'Error': 'Error Sending Transaction: ' + str(sent_tx['errors'][0]['error'])}, status=status.HTTP_400_BAD_REQUEST)
 
             ## Getting Updated Balance for Receiving Wallet
             blockcypherResponse = SearchAddress(address)
