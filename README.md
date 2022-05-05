@@ -40,4 +40,4 @@ Once you have built the front-end navigate to the root directory and start the D
   - Updated Commenting & Documentation.
 - **May 5, 2022:**
   - Further improved Blockcypher error trapping.
-  - Added comment explaining modifications needed if app was to include fees on transactions (view.py - Line 153)
+  - Added comment explaining modifications needed if app was to include fees on transactions (view.py - Line 156)

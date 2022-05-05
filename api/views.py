@@ -150,18 +150,19 @@ class CreatePublicWalletSendView(APIView):
                 activeSenderWallet = activeQueryset[0]
 
                 ## Create Unsigned Transaction
-                ## ! NOTE:  Currently this application is not including fees on transactions
-                ## !!!!!!!  If this were to be modified an additional output would need to
-                ## !!!!!!!  be added to prevent left over satoshis getting consumed by fees
                 inputs = [{'address': activeSenderWallet.address}, ]
                 outputs = [{'address': address, 'value': int(amount)},]
                 try:
                     unsigned_tx = create_unsigned_tx(api_key=API_KEY, inputs=inputs, outputs=outputs, coin_symbol='btc-testnet', preference='zero')
+                    ## Remove 'preference' argument above to send transactions with fees to allow confirmations
+                    ## Alternatively change value of 'preference' to 'low' or 'medium' for lower fees and slower confirmations
+                    ## Default value of 'preference' is 'high'
+                    ## (Suggested Min Balance of sending wallet with 'high' 'preference': 50,000 satoshis)
                 except AssertionError as e:
                     return Response({'Error': 'Error Creating Unsigned Transation: Invalid Address for Coin Symbol'}, status=status.HTTP_400_BAD_REQUEST)
                 except:
                     print('\nError Creating Unsigned Transation: ' + str(sys.exc_info()[0]) + '\n')
-                    return Response({'Error': 'Error Creating Unsigned Transation: Invalid API Key\n\nSee Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'Error': 'Error Creating Unsigned Transation: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                 if 'errors' in unsigned_tx and unsigned_tx['errors'][0] is not None:
                     return Response({'Error': 'Error Creating Transaction: ' + str(unsigned_tx['errors'][0]['error'])}, status=status.HTTP_400_BAD_REQUEST)
 
