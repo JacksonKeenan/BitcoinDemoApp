@@ -11,10 +11,13 @@ function walletsInitial() {
 }
 
 function AllPublicWallets(props) {
+  // State Management
   const [recentWallets, updateRecentWallets] = useState(() => walletsInitial())
-  
+
+  // On Load Effects
   useEffect(() => { loadWallets() }, []);
 
+  // Loads State for All Public Wallets
   function loadWallets() {
     var newRecentWallets = walletsInitial()
     const getRequestOptions = {
@@ -30,6 +33,7 @@ function AllPublicWallets(props) {
       });
   }
 
+  // Renders All Public Wallets
   function renderWalletList() {
     if (recentWallets.length > 0) {
       return(
@@ -45,6 +49,7 @@ function AllPublicWallets(props) {
     }
   }
 
+  // Markup
   return (
     <div className="PublicWallets">
       <Grid container spacing={1} alignItems="center">

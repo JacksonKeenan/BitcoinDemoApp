@@ -38,16 +38,19 @@ function walletsInitial() {
 }
 
 function SenderWallet(props) {
+  // State Management
   const [activeWallet, updateActiveWallet] = useState(() => walletInitial())
   const [wallet, updateWallet] = useState(() => walletInitial())
   const [availableWallets, updateAvailableWallets] = useState(() => walletsInitial())
   const [hidden, setHidden] = useState(true)
 
+  // On Load Effects
   useEffect(() => {
     loadActiveWallet()
     loadAvailableWallets()
   }, []);
 
+  // Loads State for Available Sending Wallets
   function loadAvailableWallets() {
     var newAvailableWallets = walletsInitial()
     const getRequestOptions = {
@@ -63,6 +66,7 @@ function SenderWallet(props) {
       });
   }
 
+  // Renders Available Wallets
   function renderAvailableWalletList() {
     if (availableWallets.length > 0) {
       return(
@@ -77,6 +81,7 @@ function SenderWallet(props) {
     }
   }
 
+  // Loads State for Active Sending Wallet
   function loadActiveWallet() {
     var newActiveWallet = walletInitial()
     const getRequestOptions = {
@@ -94,6 +99,7 @@ function SenderWallet(props) {
       });
   }
 
+  // Refreshes State for Active Sending Wallet
   function refreshActiveWallet() {
     var newActiveWallet = walletInitial()
     const getRequestOptions = {
@@ -126,11 +132,13 @@ function SenderWallet(props) {
       })
   }
 
+  // Updates State on Name Field Change
   function handleNameFieldChange(e) {
     var newWallet = { name: e.target.value, }
     updateWallet(prevWallet => newWallet)
   }
 
+  // Sets Active Wallet
   function setWallet() {
     var newActiveWallet = walletInitial()
     if(!wallet.name || wallet.name == 'n/a'){
@@ -156,6 +164,7 @@ function SenderWallet(props) {
     }
   }
 
+  //Markup
   return (
     <div className="SenderWallet">
       <ThemeProvider theme={theme}>

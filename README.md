@@ -32,7 +32,9 @@ Once you have built the front-end navigate to the root directory and start the D
     - Removed  'RecentPublicWalletView' and added the ability to filter by a time delta to 'PublicWalletView'.
 - **May 4, 2022:**
     - Updated Commenting & Documentation.
-- **May 4, 2022:**
+- **May 4, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/3b665ff14f687516a440fb81ecb4e7afed1fe6df)
   - Added the ability for the user to view the sending wallets currently available in the system through the 'View Available Wallets' button.
   - 'PublicWalletView' now returns wallets sorted by date/time.
   - Further improved Blockcypher error trapping.
+- **May 4, 2022:**
+  - Updated Commenting & Documentation.

@@ -41,10 +41,14 @@ function walletsInitial() {
 }
 
 function PublicWallets(props) {
+  // State Management
   const [wallet, updateWallet] = useState(() => walletInitial())
   const [recentWallets, updateRecentWallets] = useState(() => walletsInitial())
+
+  // On Load Effects
   useEffect(() => { loadWallets() }, []);
 
+  // Loads State for Recent Public Wallets
   function loadWallets() {
     var newRecentWallets = walletsInitial()
     const getRequestOptions = {
@@ -60,16 +64,19 @@ function PublicWallets(props) {
       });
   }
 
+  // Updates State on Address Field Change
   function handleAddressFieldChange(e) {
     const newWallet = { address: e.target.value, amount: wallet.amount, }
     updateWallet(prevWallet => newWallet)
   }
 
+  // Updates State on Amount Field Change
   function handleAmountFieldChange(e) {
     const newWallet = { address: wallet.address, amount: e.target.value, }
     updateWallet(prevWallet => newWallet)
   }
 
+  // Sends Transation to Given Address, Then Updates that Addresses Information
   function searchAndSend() {
     var newRecentWallets = walletsInitial()
 
@@ -107,6 +114,7 @@ function PublicWallets(props) {
       });
   }
 
+  // Updates Information on Given Address
   function searchWallet() {
     var newRecentWallets = walletsInitial()
     const requestOptions = {
@@ -136,6 +144,7 @@ function PublicWallets(props) {
       });
   }
 
+  // Renders Recent Public Wallets
   function renderWalletList() {
     if (recentWallets.length > 0) {
       return(
@@ -151,6 +160,7 @@ function PublicWallets(props) {
     }
   }
 
+  // Markup
   return (
     <div className="PublicWallets">
       <ThemeProvider theme={theme}>

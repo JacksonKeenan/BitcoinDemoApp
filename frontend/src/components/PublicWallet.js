@@ -13,14 +13,19 @@ function walletInitial() {
 }
 
 function PublicWallet(props) {
+  // State Management
   const [wallet, updateWallet] = useState(() => walletInitial())
   const walletAddressParam =  useParams().address;
+
+  // Navigation Hook
   const navigate = useNavigate();
-  
+
+  // On Load Effects
   useEffect(() => {
     getWalletDetails()
   }, []);
 
+  // Loads State for Current Public Wallet
   function getWalletDetails() {
     var newWallet = walletInitial()
     fetch('/api/get-public-wallet?address=' + walletAddressParam).then((response) => response.json()).then((data) => {
@@ -32,6 +37,7 @@ function PublicWallet(props) {
     });
   }
 
+  // Markup
   return(
     <div className="PublicWallets">
       <Grid container spacing={1} alignItems="center">

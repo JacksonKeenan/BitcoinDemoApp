@@ -227,7 +227,7 @@ class PublicWalletView(generics.ListAPIView):
             time_threshold = timezone.now() - timezone.timedelta(minutes=int(delta))
             queryset = PublicWallet.objects.filter(last_updated__gt=time_threshold).order_by('-last_updated')
         else:
-            queryset = PublicWallet.objects.all().order_by('last_updated')
+            queryset = PublicWallet.objects.all().order_by('-last_updated')
         return queryset
 
 ## Retruns a Public Wallet with the Given Address
