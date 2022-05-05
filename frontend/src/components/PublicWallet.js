@@ -16,6 +16,7 @@ function PublicWallet(props) {
   const [wallet, updateWallet] = useState(() => walletInitial())
   const walletAddressParam =  useParams().address;
   const navigate = useNavigate();
+  
   useEffect(() => {
     getWalletDetails()
   }, []);

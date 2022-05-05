@@ -55,3 +55,14 @@ img {
 a {
   color: #356554;
 }
+
+.availableWallets {
+  border-bottom: 2px solid #fa4616;
+  padding: 2em;
+  margin-bottom: 1em;
+}
+
+.availableWallets .availableWallet {
+  display: inline;
+  font-weight: normal;
+}

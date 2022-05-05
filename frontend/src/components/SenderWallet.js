@@ -17,6 +17,7 @@ const theme = createTheme({
     },
     green: {
       main: '#356554',
+      contrastText: '#d6d2c4',
     },
     offwhite: {
       main: '#d6d2c4',
@@ -30,10 +31,51 @@ function walletInitial() {
   return wallet
 }
 
+// Initializing Available Wallets
+function walletsInitial() {
+  var wallets = {}
+  return wallets
+}
+
 function SenderWallet(props) {
   const [activeWallet, updateActiveWallet] = useState(() => walletInitial())
   const [wallet, updateWallet] = useState(() => walletInitial())
-  useEffect(() => { loadActiveWallet() }, []);
+  const [availableWallets, updateAvailableWallets] = useState(() => walletsInitial())
+  const [hidden, setHidden] = useState(true)
+
+  useEffect(() => {
+    loadActiveWallet()
+    loadAvailableWallets()
+  }, []);
+
+  function loadAvailableWallets() {
+    var newAvailableWallets = walletsInitial()
+    const getRequestOptions = {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+    };
+
+    fetch('/api/list-sender-wallets', getRequestOptions).then((response) =>
+      response.json()
+    ).then((data) => {
+        newAvailableWallets = data
+        updateAvailableWallets(prevAvailableWallets => newAvailableWallets)
+      });
+  }
+
+  function renderAvailableWalletList() {
+    if (availableWallets.length > 0) {
+      return(
+        availableWallets.map((wallet, i, availableWallets) => {
+          if(i+1 === availableWallets.length) {
+            return ( <span className='availableWallet'>{ wallet.name } </span> )
+          } else {
+            return ( <span className='availableWallet'>{ wallet.name }, </span> )
+          }
+        })
+      )
+    }
+  }
 
   function loadActiveWallet() {
     var newActiveWallet = walletInitial()
@@ -108,6 +150,7 @@ function SenderWallet(props) {
         } else {
           newActiveWallet = data
           updateActiveWallet(prevActiveWallet => newActiveWallet)
+          loadAvailableWallets()
         }
       });
     }
@@ -133,7 +176,13 @@ function SenderWallet(props) {
               </Button>
           </Grid>
           <Grid item xs={12} align="center">
-            <div className="name"><span>Wallet Name</span>{ activeWallet.name }</div>
+              <Button onClick={ () => setHidden(s => !s) } color="green" variant="contained" style={{ minWidth: '100%', display: 'block'}}>
+                { !hidden ? <>Hide Available Wallets</> : <>View Available Wallets</> }
+              </Button>
+              { !hidden ? <div className="availableWallets"> <Typography component="h3" variant="h5"> Available Wallets </Typography>{ renderAvailableWalletList() }</div>: null }
+          </Grid>
+          <Grid item xs={12} align="center">
+            <div className="name"><span>Active Wallet Name</span>{ activeWallet.name }</div>
           </Grid>
           <Grid item xs={12} align="center">
             <div className="address"><span>Public Address</span>{ activeWallet.address }</div>
