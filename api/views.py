@@ -164,7 +164,7 @@ class CreatePublicWalletSendView(APIView):
                     print('\nError Creating Unsigned Transation: ' + str(sys.exc_info()[0]) + '\n')
                     return Response({'Error': 'Error Creating Unsigned Transation: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
                 if 'errors' in unsigned_tx and unsigned_tx['errors'][0] is not None:
-                    return Response({'Error': 'Error Creating Transaction: ' + str(unsigned_tx['errors'][0]['error'])}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'Error': 'Error Creating Unsigned Transaction: ' + str(unsigned_tx['errors'][0]['error'])}, status=status.HTTP_400_BAD_REQUEST)
 
                 ## Create Public & Private Key Lists ( Size of unsigned_tx['tosign'] )
                 privkey_list = []
