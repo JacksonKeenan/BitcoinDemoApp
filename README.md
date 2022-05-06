@@ -38,6 +38,8 @@ Once you have built the front-end navigate to the root directory and start the D
   - Further improved Blockcypher error trapping.
 - **May 4, 2022:**
   - Updated Commenting & Documentation.
-- **May 5, 2022:**
+- **May 5, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/d4c48edf5b8edabe432224ac6813dcd4cf7dd4a5)
   - Further improved Blockcypher error trapping.
   - Added comment explaining modifications needed if app was to include fees on transactions (view.py - Line 156)
+- **May 6, 2022:**
+  - Further improved Blockcypher error trapping.
