@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/react,django
 # Edit at https://www.toptal.com/developers/gitignore?templates=react,django
 
+# API Keys
+.blockcypher_api
+
 ### Django ###
 *.log
 *.pot

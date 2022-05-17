@@ -1,0 +1,21 @@
+version: "3.2"
+services:
+  project:
+    restart: always
+    container_name: code
+    command : bash -c "export BC_API=$$(cat .blockcypher_api) && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+
+  frontend:
+    restart: always
+    command : npm start
+    container_name: front
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"

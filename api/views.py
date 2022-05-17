@@ -162,7 +162,7 @@ class CreatePublicWalletSendView(APIView):
                     return Response({'Error': 'Error Creating Unsigned Transation: Invalid Address for Coin Symbol'}, status=status.HTTP_400_BAD_REQUEST)
                 except Exception as e:
                     print('\nError Creating Unsigned Transation: ' + str(e) + '\n')
-                    return Response({'Error': 'Error Creating Unsigned Transation: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'Error': 'Error Creating Unsigned Transation: ' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
                 except:
                     print('\nError Creating Unsigned Transation: ' + str(sys.exc_info()[0]) + '\n')
                     return Response({'Error': 'Error Creating Unsigned Transaction: See Django Console for More Information'}, status=status.HTTP_400_BAD_REQUEST)
