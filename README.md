@@ -1,13 +1,10 @@
 # Setup
 
-## Setting Environment Variables
-Currently the only environment variable that needs to be set is your Blockcypher API Token which should be set as **'BC_API'**.
+## API Key File
+After cloning the repository create a file containing your Blockcypher API key in the root directory named `.blockcypher_api`. If you do no have an API key you can generate one [here](https://accounts.blockcypher.com/tokens)
 
-## Building the Project
-To run the project you must first create a build of the front-end which utilizes a react project. To do this navigate to the 'frontend' directory and type **'npm run build'** (This information can also be found in the README.md file in the 'frontend' directory).
-
-## Running the project
-Once you have built the front-end navigate to the root directory and start the Django service by typing **'python ./manage.py runserver'**.
+## Building & Running the Project
+In the root directory run `docker-compose up --build`. You will need to have [Docker](https://www.docker.com/products/docker-desktop/) setup to run this command.
 
 # Changelog
 - **April 27, 2022:**
@@ -41,5 +38,13 @@ Once you have built the front-end navigate to the root directory and start the D
 - **May 5, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/d4c48edf5b8edabe432224ac6813dcd4cf7dd4a5)
   - Further improved Blockcypher error trapping.
   - Added comment explaining modifications needed if app was to include fees on transactions (view.py - Line 156)
-- **May 6, 2022:**
+- **May 6, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/c51e77e0dd762d9d30d7f3d05cd46c5c9bd754b3)
   - Further improved Blockcypher error trapping.
+- **May 16, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/beb0d8010ec922395db7d2b93bfdc84224d5617f)
+  - Updated error trapping.
+- **May 17, 2022:** [Link](https://github.com/JacksonKeenan/BitcoinDemoApp/commit/b6506ad11f2512ce2e8a1043013d896dd541698c)
+  - Added Docker support
+- **June 14, 2022:**
+  - Fixed bug with Docker Compose file which was preventing application from running without being built with node beforehand.
+  - Updated README
+
